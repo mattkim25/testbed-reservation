@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testbed Reservation System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827; /* Dark gray background */
+            color: #E5E7EB; /* Light gray text */
+        }
+        .font-fira {
+            font-family: 'Fira Code', monospace;
+        }
+        .card {
+            background-color: #1F2937; /* Gray 800 */
+            border: 1px solid #374151; /* Gray 700 */
+            border-radius: 0.5rem;
+            transition: all 0.2s ease-in-out;
+        }
+        .card:hover {
+            border-color: #4F46E5; /* Indigo 500 */
+            transform: translateY(-2px);
+        }
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            transition: background-color 0.2s ease-in-out;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-primary {
+            background-color: #4F46E5;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #4338CA;
+        }
+        .btn-secondary {
+            background-color: #374151;
+            color: #E5E7EB;
+        }
+        .btn-secondary:hover {
+            background-color: #4B5563;
+        }
+        .btn-danger {
+            background-color: #DC2626;
+            color: white;
+        }
+        .btn-danger:hover {
+            background-color: #B91C1C;
+        }
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .status-available { background-color: #22C55E; } /* Green 500 */
+        .status-reserved { background-color: #F97316; } /* Orange 500 */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+        .modal-content {
+            background-color: #1F2937;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            width: 90%;
+            max-width: 500px;
+        }
+        .history-entry {
+            border-left: 2px solid #4B5563;
+            padding-left: 1rem;
+            position: relative;
+        }
+        .history-entry::before {
+            content: '';
+            position: absolute;
+            left: -6px;
+            top: 5px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #4B5563;
+        }
+    </style>
+</head>
+<body class="h-full">
+    <div id="app" class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+        
+        <!-- Header -->
+        <header class="mb-8">
+            <h1 class="text-3xl font-bold text-white">Testbed Reservation System</h1>
+            <p class="text-gray-400 mt-1">Reserve testbeds and DUTs to avoid conflicts.</p>
+            <div id="auth-status" class="mt-4 text-sm font-fira p-3 bg-gray-900 rounded-md border border-gray-700">
+                Connecting...
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- DUT List -->
+            <section class="lg:col-span-1">
+                <h2 class="text-xl font-semibold text-white mb-4">Available DUTs</h2>
+                <div id="dut-list" class="space-y-4">
+                    <!-- DUT cards will be injected here -->
+                    <div class="text-gray-400">Loading DUTs...</div>
+                </div>
+            </section>
+
+            <!-- Details & History Panel -->
+            <section class="lg:col-span-2">
+                <div id="details-panel" class="card p-6 sticky top-8">
+                    <div id="details-placeholder" class="text-center text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                        </svg>
+                        <p class="mt-2">Select a DUT from the list to see details and make a reservation.</p>
+                    </div>
+                    <div id="details-content" class="hidden">
+                        <!-- Details will be injected here -->
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Reservation Modal -->
+    <div id="reservation-modal" class="modal-backdrop hidden">
+        <div class="modal-content">
+            <h3 class="text-xl font-bold text-white mb-4">Reserve DUT: <span id="modal-dut-name" class="font-fira"></span></h3>
+            <div class="space-y-4">
+                <div>
+                    <label for="reservation-duration" class="block text-sm font-medium text-gray-300">Reservation Duration (in hours)</label>
+                    <input type="number" id="reservation-duration" min="1" max="24" value="1" class="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md shadow-sm text-white focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2">
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button id="cancel-reservation-btn" class="btn btn-secondary">Cancel</button>
+                    <button id="confirm-reservation-btn" class="btn btn-primary">Confirm Reservation</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, collection, onSnapshot, addDoc, updateDoc, query, where, getDocs, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- CONFIGURATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyCY9m4tTTYsDTL1dIq0DNyDUDntwv166mU",
+            authDomain: "testbed-reservation.firebaseapp.com",
+            projectId: "testbed-reservation",
+            storageBucket: "testbed-reservation.firebasestorage.app",
+            messagingSenderId: "473238343334",
+            appId: "1:473238343334:web:c9b898d0aba5157a572e67"
+        };
+        
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-testbed-app';
+
+        // --- MOCK DATA ---
+        // This list defines the testbeds and DUTs available in the system.
+        const TESTBEDS = [
+            { id: 'upscalelab1_t0_standalone', name: 'Upscale Lab T0 Standalone', duts: [
+                { id: 'upscalelab1-spine1', name: 'upscalelab1-spine1' },
+                { id: 'upscalelab1-spine2', name: 'upscalelab1-spine2' },
+                { id: 'upscalelab1-leaf1', name: 'upscalelab1-leaf1' },
+            ]},
+            { id: 'wistron_testbed_t0_ngty', name: 'Wistron Testbed T0 NGTY', duts: [
+                { id: 'wistron-dut1', name: 'wistron-dut1' },
+                { id: 'wistron-dut2', name: 'wistron-dut2' },
+            ]}
+        ];
+
+        // --- APPLICATION STATE ---
+        let db, auth;
+        let userId = null;
+        let reservations = [];
+        let selectedDutId = null;
+
+        // --- DOM ELEMENTS ---
+        const dutListEl = document.getElementById('dut-list');
+        const detailsPlaceholderEl = document.getElementById('details-placeholder');
+        const detailsContentEl = document.getElementById('details-content');
+        const authStatusEl = document.getElementById('auth-status');
+        const modalEl = document.getElementById('reservation-modal');
+        const modalDutNameEl = document.getElementById('modal-dut-name');
+        const durationInputEl = document.getElementById('reservation-duration');
+
+        // --- INITIALIZATION ---
+        async function main() {
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                
+                onAuthStateChanged(auth, user => {
+                    if (user) {
+                        userId = user.uid;
+                        authStatusEl.innerHTML = `User ID: <span class="font-fira text-green-400">${userId}</span>`;
+                        setupRealtimeListeners();
+                        renderDutList();
+                    }
+                });
+
+                const token = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+                if (token) {
+                    await signInWithCustomToken(auth, token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Firebase initialization failed:", error);
+                authStatusEl.textContent = "Error: Could not connect to the reservation service.";
+                dutListEl.innerHTML = `<div class="card p-4 text-red-400">Failed to load DUTs. Check console for errors.</div>`;
+            }
+        }
+
+        // --- REAL-TIME DATA ---
+        function setupRealtimeListeners() {
+            const reservationsCollection = collection(db, `artifacts/${appId}/public/reservations`);
+            const q = query(reservationsCollection, where("isActive", "==", true));
+
+            onSnapshot(q, (snapshot) => {
+                reservations = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderDutList();
+                if (selectedDutId) {
+                    renderDetails(selectedDutId);
+                }
+            }, (error) => {
+                console.error("Error fetching reservations:", error);
+                alert("Could not fetch real-time reservation data.");
+            });
+        }
+
+        // --- RENDERING LOGIC ---
+        function renderDutList() {
+            if (!userId) return; // Don't render if not authenticated
+            dutListEl.innerHTML = ''; // Clear existing list
+            
+            TESTBEDS.forEach(testbed => {
+                const testbedHeader = document.createElement('h3');
+                testbedHeader.className = 'text-lg font-semibold text-gray-300 mt-6 first:mt-0';
+                testbedHeader.textContent = testbed.name;
+                dutListEl.appendChild(testbedHeader);
+
+                testbed.duts.forEach(dut => {
+                    const reservation = reservations.find(r => r.dutId === dut.id);
+                    const isAvailable = !reservation;
+                    const card = document.createElement('div');
+                    card.className = `card p-4 cursor-pointer ${selectedDutId === dut.id ? 'border-indigo-500' : ''}`;
+                    card.innerHTML = `
+                        <div class="flex justify-between items-center">
+                            <span class="font-fira font-medium text-white">${dut.name}</span>
+                            <div class="flex items-center space-x-2">
+                                <span class="status-dot ${isAvailable ? 'status-available' : 'status-reserved'}"></span>
+                                <span class="text-sm ${isAvailable ? 'text-green-400' : 'text-orange-400'}">${isAvailable ? 'Available' : 'Reserved'}</span>
+                            </div>
+                        </div>
+                    `;
+                    card.onclick = () => {
+                        selectedDutId = dut.id;
+                        renderDutList(); // Re-render to show selection
+                        renderDetails(dut.id);
+                    };
+                    dutListEl.appendChild(card);
+                });
+            });
+        }
+
+        async function renderDetails(dutId) {
+            const dut = TESTBEDS.flatMap(tb => tb.duts).find(d => d.id === dutId);
+            if (!dut) return;
+
+            detailsPlaceholderEl.classList.add('hidden');
+            detailsContentEl.classList.remove('hidden');
+
+            const reservation = reservations.find(r => r.dutId === dutId);
+            const isReservedByCurrentUser = reservation && reservation.userId === userId;
+
+            let reservationInfoHtml = `
+                <div class="p-4 bg-gray-800 rounded-lg">
+                    <div class="flex items-center space-x-3">
+                        <span class="status-dot status-available"></span>
+                        <span class="text-lg font-semibold text-green-400">Available</span>
+                    </div>
+                    <p class="text-sm text-gray-400 mt-2">This DUT is available for reservation.</p>
+                </div>
+                <div class="mt-4">
+                    <button id="reserve-btn" class="btn btn-primary w-full">Reserve Now</button>
+                </div>
+            `;
+
+            if (reservation) {
+                const endTime = reservation.endTime.toDate();
+                reservationInfoHtml = `
+                    <div class="p-4 bg-gray-800 rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <span class="status-dot status-reserved"></span>
+                            <span class="text-lg font-semibold text-orange-400">Reserved</span>
+                        </div>
+                        <div class="mt-3 space-y-2 text-sm">
+                            <p class="text-gray-300">Reserved by: <span class="font-fira text-cyan-400">${reservation.userId === userId ? 'You' : reservation.userId}</span></p>
+                            <p class="text-gray-300">Expires: <span class="font-medium text-white">${endTime.toLocaleString()}</span></p>
+                        </div>
+                    </div>
+                    ${isReservedByCurrentUser ? `
+                    <div class="mt-4">
+                        <button id="release-btn" class="btn btn-danger w-full">Release Reservation</button>
+                    </div>` : ''}
+                `;
+            }
+
+            // Fetch and render history
+            const historyCollection = collection(db, `artifacts/${appId}/public/reservations`);
+            const historyQuery = query(historyCollection, where("dutId", "==", dutId));
+            const historySnapshot = await getDocs(historyQuery);
+            const history = historySnapshot.docs.map(doc => doc.data()).sort((a, b) => b.startTime.seconds - a.startTime.seconds);
+            
+            let historyHtml = '<p class="text-gray-500">No reservation history for this DUT.</p>';
+            if (history.length > 0) {
+                historyHtml = history.map(h => `
+                    <div class="history-entry pb-4">
+                        <p class="font-medium text-white">${h.isActive ? 'Active Reservation' : 'Past Reservation'}</p>
+                        <p class="text-sm text-gray-400">User: <span class="font-fira">${h.userId}</span></p>
+                        <p class="text-sm text-gray-400">Reserved: ${h.startTime.toDate().toLocaleString()}</p>
+                        <p class="text-sm text-gray-400">Ended: ${h.endTime.toDate().toLocaleString()}</p>
+                    </div>
+                `).join('');
+            }
+
+            detailsContentEl.innerHTML = `
+                <h3 class="text-2xl font-bold text-white mb-4 font-fira">${dut.name}</h3>
+                ${reservationInfoHtml}
+                <div class="mt-8">
+                    <h4 class="text-xl font-semibold text-white mb-4">History</h4>
+                    <div class="relative">${historyHtml}</div>
+                </div>
+            `;
+            
+            // Add event listeners for new buttons
+            const reserveBtn = document.getElementById('reserve-btn');
+            if (reserveBtn) reserveBtn.onclick = () => showReservationModal(dutId);
+
+            const releaseBtn = document.getElementById('release-btn');
+            if (releaseBtn) releaseBtn.onclick = () => releaseReservation(reservation.id);
+        }
+
+        // --- ACTIONS ---
+        function showReservationModal(dutId) {
+            const dut = TESTBEDS.flatMap(tb => tb.duts).find(d => d.id === dutId);
+            modalDutNameEl.textContent = dut.name;
+            modalEl.classList.remove('hidden');
+            
+            document.getElementById('confirm-reservation-btn').onclick = () => makeReservation(dutId);
+        }
+
+        function hideReservationModal() {
+            modalEl.classList.add('hidden');
+        }
+
+        async function makeReservation(dutId) {
+            const durationHours = parseInt(durationInputEl.value, 10);
+            if (isNaN(durationHours) || durationHours <= 0) {
+                alert("Please enter a valid duration in hours.");
+                return;
+            }
+
+            const now = new Date();
+            const endTime = new Date(now.getTime() + durationHours * 60 * 60 * 1000);
+
+            try {
+                const reservationsCollection = collection(db, `artifacts/${appId}/public/reservations`);
+                await addDoc(reservationsCollection, {
+                    dutId: dutId,
+                    userId: userId,
+                    startTime: serverTimestamp(),
+                    endTime: Timestamp.fromDate(endTime),
+                    isActive: true
+                });
+                hideReservationModal();
+            } catch (error) {
+                console.error("Error making reservation: ", error);
+                alert("Failed to make reservation. It might have been taken by someone else.");
+            }
+        }
+        
+        async function releaseReservation(reservationId) {
+            if (!confirm("Are you sure you want to release this reservation?")) return;
+            
+            try {
+                const reservationDoc = doc(db, `artifacts/${appId}/public/reservations`, reservationId);
+                await updateDoc(reservationDoc, {
+                    isActive: false
+                });
+                // The onSnapshot listener will handle the UI update automatically
+            } catch (error) {
+                console.error("Error releasing reservation: ", error);
+                alert("Failed to release reservation.");
+            }
+        }
+
+        // --- GLOBAL EVENT LISTENERS ---
+        document.getElementById('cancel-reservation-btn').onclick = hideReservationModal;
+        modalEl.onclick = (e) => {
+            if (e.target === modalEl) {
+                hideReservationModal();
+            }
+        };
+
+        // --- START THE APP ---
+        main();
+
+    </script>
+</body>
+</html>
