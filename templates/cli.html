@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head><title>DUT CLI</title></head>
+<body>
+  <h1>Reserve a DUT</h1>
+  <form action="/api/reserve" method="POST">
+    DUT ID: <input name="dut"><br>
+    Name: <input name="user"><br>
+    Hours: <select name="hours">
+      <option>1</option><option>2</option><option>3</option><option>4</option>
+    </select><br>
+    <input type="submit" value="Reserve DUT">
+  </form>
+
+  <h1>Delete a Reservation</h1>
+  <form action="/api/delete" method="POST">
+    DUT ID: <input name="dut"><br>
+    <input type="submit" value="Delete Reservation">
+  </form>
+</body>
+</html>

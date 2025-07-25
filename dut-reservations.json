@@ -1,0 +1,11 @@
+{
+    "dut-1": {
+      "status": "reserved",
+      "user": "alice",
+      "expires_at": "2025-07-26T14:00:00Z"
+    },
+    "dut-2": {
+      "status": "available"
+    }
+  }
+  
