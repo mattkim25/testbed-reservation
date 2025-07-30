@@ -1,0 +1,258 @@
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f8fafc;
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+    color: #333;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+}
+
+.header {
+    background: #3b82f6;
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.back-btn {
+    color: white;
+    text-decoration: none;
+    padding: 8px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.back-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.schedule-container {
+    padding: 20px;
+}
+
+.current-date {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 15px;
+    background: #f8fafc;
+    border-radius: 8px;
+}
+
+.current-date h2 {
+    margin: 0;
+    color: #374151;
+    font-size: 1.5rem;
+}
+
+.time-slots {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 15px;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.time-header, .slots-header {
+    font-weight: 600;
+    color: #374151;
+    padding: 15px;
+    background: #f9fafb;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.time-label {
+    padding: 12px;
+    font-size: 1rem;
+    color: #6b7280;
+    text-align: right;
+    font-family: monospace;
+    font-weight: 500;
+}
+
+.slot {
+    height: 50px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #f9fafb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.slot:hover {
+    background: #e5e7eb;
+    border-color: #d1d5db;
+}
+
+.slot.selected {
+    background: #3b82f6;
+    border-color: #2563eb;
+}
+
+.slot.reserved {
+    background: #ef4444;
+    border-color: #dc2626;
+    cursor: not-allowed;
+    color: white;
+}
+
+.reservations-list {
+    margin-top: 30px;
+    padding: 20px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.reservations-list h3 {
+    margin: 0 0 20px 0;
+    color: #374151;
+    font-size: 1.2rem;
+}
+
+.reservation-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    margin-bottom: 10px;
+}
+
+.reservation-info {
+    flex: 1;
+}
+
+.reservation-dut {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 4px;
+}
+
+.reservation-details {
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+.reservation-times {
+    font-size: 0.85rem;
+    color: #3b82f6;
+    font-weight: 500;
+}
+
+.controls {
+    padding: 20px;
+    background: #f9fafb;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.name-input {
+    padding: 10px 15px;
+    border: 2px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    min-width: 150px;
+    transition: border-color 0.2s ease;
+}
+
+.name-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+}
+
+.save-btn, .clear-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.save-btn {
+    background: #3b82f6;
+    color: white;
+}
+
+.save-btn:hover {
+    background: #2563eb;
+}
+
+.save-btn:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+}
+
+.clear-btn {
+    background: #6b7280;
+    color: white;
+}
+
+.clear-btn:hover {
+    background: #4b5563;
+}
+
+.info {
+    padding: 15px 20px;
+    background: #f0f9ff;
+    border-top: 1px solid #e5e7eb;
+    color: #0369a1;
+    font-size: 0.9rem;
+}
+
+.info p {
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .container {
+        margin: 10px;
+    }
+    
+    .header {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+    
+    .controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .name-input, .save-btn, .clear-btn {
+        width: 100%;
+    }
+} 

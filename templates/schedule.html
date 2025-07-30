@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule - {{ friendly_name }}</title>
+    <link rel="stylesheet" href="/static/schedule.css">
+    <script src="/static/schedule.js" defer></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>{{ friendly_name }} ({{ dut_ip }})</h1>
+            <a href="/" class="back-btn">← Back to Dashboard</a>
+        </div>
+        
+        <div class="schedule-container">
+            <div class="current-date">
+                <h2>{{ current_date }}</h2>
+            </div>
+            
+            <div class="time-slots">
+                <div class="time-header">Time</div>
+                <div class="slots-header">Available Slots</div>
+                {% for hour in range(24) %}
+                    <div class="time-label">{{ "%02d:00"|format(hour) }}</div>
+                    <div class="slot" data-time="{{ "%02d:00"|format(hour) }}" data-hour="{{ hour }}"></div>
+                {% endfor %}
+            </div>
+            
+            <div class="reservations-list">
+                <h3>Today's Reservations</h3>
+                <div id="reservations-container">
+                    <!-- Reservations will be loaded here -->
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <input type="text" id="user-name" placeholder="Your name" class="name-input">
+            <button id="save-schedule" class="save-btn">Save Schedule</button>
+            <button id="clear-selection" class="clear-btn">Clear Selection</button>
+        </div>
+        
+        <div class="info">
+            <p>Click and drag to select time slots. Selected slots will be highlighted in blue.</p>
+        </div>
+    </div>
+</body>
+</html> 

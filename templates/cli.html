@@ -2,9 +2,47 @@
 <html>
 <head><title>DUT CLI</title></head>
 <body>
+  <h1>Current DUT Status</h1>
+  <table border="1">
+    <tr><th>DUT IP</th><th>Name</th><th>Status</th><th>Reserved By</th><th>Expires At</th></tr>
+    {% for dut_ip, status_info in dut_status.items() %}
+    <tr>
+      <td>{{ dut_ip }}</td>
+      <td><strong>{{ status_info.friendly_name }}</strong></td>
+      <td>
+        {% if status_info.status == "available" %}
+          <strong style="color: green;">AVAILABLE</strong>
+        {% else %}
+          <strong style="color: red;">RESERVED</strong>
+        {% endif %}
+      </td>
+      <td>
+        {% if status_info.status == "reserved" %}
+          {{ status_info.user }}
+        {% else %}
+          -
+        {% endif %}
+      </td>
+      <td>
+        {% if status_info.status == "reserved" %}
+          {{ status_info.expires_at }}
+        {% else %}
+          -
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+
   <h1>Reserve a DUT</h1>
   <form action="/api/reserve" method="POST">
-    DUT ID: <input name="dut"><br>
+    DUT ID: <select name="dut">
+      {% for dut_ip, status_info in dut_status.items() %}
+        {% if status_info.status == "available" %}
+          <option value="{{ dut_ip }}">{{ dut_ip }} ({{ status_info.friendly_name }}) - Available</option>
+        {% endif %}
+      {% endfor %}
+    </select><br>
     Name: <input name="user"><br>
     Hours: <select name="hours">
       <option>1</option><option>2</option><option>3</option><option>4</option>
@@ -14,8 +52,16 @@
 
   <h1>Delete a Reservation</h1>
   <form action="/api/delete" method="POST">
-    DUT ID: <input name="dut"><br>
+    DUT ID: <select name="dut">
+      {% for dut_ip, status_info in dut_status.items() %}
+        {% if status_info.status == "reserved" %}
+          <option value="{{ dut_ip }}">{{ dut_ip }} ({{ status_info.friendly_name }}) - {{ status_info.user }}</option>
+        {% endif %}
+      {% endfor %}
+    </select><br>
     <input type="submit" value="Delete Reservation">
   </form>
+
+  <p><a href="/cli">Refresh Status</a></p>
 </body>
 </html>

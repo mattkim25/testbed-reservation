@@ -1,13 +1,281 @@
 body {
-    font-family: sans-serif;
-    padding: 1rem;
-  }
-  table, th, td {
-    border: 1px solid black;
-    border-collapse: collapse;
-    padding: 0.5rem;
-  }
-  input, select {
-    margin: 0.2rem;
-  }
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f8fafc;
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+    color: #333;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+}
+
+#clock-container {
+    background: #3b82f6;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    border-radius: 0;
+    margin: 0;
+}
+
+#current-time {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+#timezone-info {
+    margin: 0;
+    font-size: 1rem;
+    opacity: 0.9;
+}
+
+.content {
+    padding: 30px;
+}
+
+.dut-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.dut-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+}
+
+.dut-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.dut-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.dut-info {
+    flex: 1;
+}
+
+.dut-ip {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+}
+
+.dut-name {
+    font-size: 0.9rem;
+    color: #7f8c8d;
+    font-weight: 500;
+    background: #ecf0f1;
+    padding: 4px 10px;
+    border-radius: 12px;
+    display: inline-block;
+    margin-bottom: 8px;
+}
+
+.schedule-toggle {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.schedule-toggle:hover {
+    background: #2563eb;
+    color: white;
+    text-decoration: none;
+}
+
+.dut-status {
+    margin-bottom: 15px;
+}
+
+.dut-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+
+
+.dut-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.dut-ip {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 1rem;
+}
+
+.dut-name {
+    font-size: 0.85rem;
+    color: #7f8c8d;
+    font-weight: 500;
+    background: #ecf0f1;
+    padding: 3px 8px;
+    border-radius: 12px;
+    display: inline-block;
+    width: fit-content;
+}
+
+.schedule-link {
+    font-size: 0.8rem;
+    color: #3b82f6;
+    text-decoration: none;
+    margin-top: 5px;
+    display: inline-block;
+    transition: color 0.2s ease;
+}
+
+.schedule-link:hover {
+    color: #2563eb;
+    text-decoration: underline;
+}
+
+.status-available {
+    color: #27ae60;
+    font-weight: 600;
+    background: #d5f4e6;
+    padding: 6px 12px;
+    border-radius: 20px;
+    display: inline-block;
+    font-size: 0.85rem;
+}
+
+.status-reserved {
+    color: #e74c3c;
+    font-weight: 600;
+    background: #fadbd8;
+    padding: 6px 12px;
+    border-radius: 20px;
+    display: inline-block;
+    font-size: 0.85rem;
+}
+
+.reservation-form {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+input[type="text"] {
+    padding: 10px 15px;
+    border: 2px solid #ecf0f1;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    transition: border-color 0.3s ease;
+    min-width: 120px;
+}
+
+input[type="text"]:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+select {
+    padding: 10px 15px;
+    border: 2px solid #ecf0f1;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    background: white;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+select:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-primary {
+    background: #3b82f6;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-danger {
+    background: #ef4444;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+    .container {
+        margin: 10px;
+        border-radius: 10px;
+    }
+    
+    .header h1 {
+        font-size: 2rem;
+    }
+    
+    .reservation-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    input[type="text"], select, .btn {
+        width: 100%;
+        margin: 5px 0;
+    }
+}
   

@@ -1,11 +1,12 @@
 {
-    "dut-1": {
-      "status": "reserved",
-      "user": "alice",
-      "expires_at": "2025-07-26T14:00:00Z"
-    },
-    "dut-2": {
-      "status": "available"
-    }
+  "10.30.2.75": {
+    "status": "reserved",
+    "user": "mkim",
+    "expires_at": "2025-07-30T02:39:27.154946-07:00"
+  },
+  "10.30.2.157": {
+    "status": "reserved",
+    "user": "mkim",
+    "expires_at": "2025-07-30T02:28:24.817886-07:00"
   }
-  
+}
